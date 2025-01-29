@@ -1,0 +1,87 @@
+1) Explain best Data Cleaning techniques?
+
+A:Before training a model, we must clean the data to improve accuracy.
+
+✅ Handling Missing Data
+
+If a column has too many missing values, drop it.
+If only a few values are missing, fill them with:
+Mean/Median (for numbers)
+Most common value (mode) (for categories)
+✅ Removing Duplicates
+
+Use df.drop_duplicates() to delete duplicate rows.
+✅ Handling Outliers
+
+Remove extreme values using:
+Z-Score (Remove values beyond ±3 standard deviations)
+IQR Method (Remove values beyond Q1 - 1.5IQR or Q3 + 1.5IQR)
+✅ Encoding Categorical Data
+
+Convert text labels into numbers:
+One-Hot Encoding for non-ordered categories (e.g., cities)
+Label Encoding for ordered categories (e.g., low, medium, high)
+✅ Scaling the Data
+
+Convert all values to a similar range using StandardScaler (mean=0, std=1).
+✅ Handling Imbalanced Data (Fraud Detection Case)
+
+Use SMOTE (oversampling) to generate synthetic fraud cases for balance.
+
+
+2) Explain Best model and why?
+
+A:The best model depends on the data, but we need one that:
+✔ Works well with imbalanced data
+✔ Detects fraud accurately
+✔ Avoids overfitting
+
+🔹 Best choices:
+
+XGBoost ✅ (Best overall) - Handles large data & imbalanced classes
+Random Forest ✅ (Good accuracy) - Uses multiple decision trees
+Logistic Regression ✅ (If data is simple) - Basic fraud detection
+SVM ✅ (For complex data) - Works well with high-dimensional data
+🚀 Final Choice: XGBoost
+Why?
+✔ High accuracy & speed
+✔ Handles imbalanced fraud cases well
+✔ Avoids overfitting using boosting
+
+3) Give me Final model with prediction?
+A.import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report
+import xgboost as xgb
+
+# Load dataset
+data = pd.read_csv("your_dataset.csv")  # Replace with your actual file
+
+# Features (X) and Target (y)
+X = data.drop(['isFlaggedFraud'], axis=1)  
+y = data['isFlaggedFraud']
+
+# Split data (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Scale features (important for XGBoost)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Train XGBoost model
+xgb_model = xgb.XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=5, scale_pos_weight=1)
+xgb_model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = xgb_model.predict(X_test)
+
+# Check accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+# Show detailed classification report
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
